@@ -12,4 +12,11 @@ type DeepAi struct {
 
 type Database struct {
 	DbConnString string
+	RestPort     int
+	Username     string
+	Password     string
+	Host         string
+	Port         string
+	Database     string
+	ConnString   string
 }
