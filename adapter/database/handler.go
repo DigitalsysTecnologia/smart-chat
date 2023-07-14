@@ -1,6 +1,11 @@
 package database
 
-import "smart-chat/internal/model"
+import (
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
+	"gorm.io/gorm/schema"
+	"smart-chat/internal/model"
+)
 
 type databaseProvider struct {
 	config *model.Config
