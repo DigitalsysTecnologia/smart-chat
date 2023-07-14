@@ -19,9 +19,8 @@ func NewConfigService() *configService {
 }
 
 func (c *configService) loadConfig() {
-	config := &model.Config{}
 
-	config.Database = model.Database{
+	c.Config.Database = model.Database{
 		Username: os.Getenv("DB_USERNAME"),
 		Password: os.Getenv("DB_PASSWORD"),
 		Host:     os.Getenv("DB_HOST"),
@@ -29,7 +28,7 @@ func (c *configService) loadConfig() {
 		Database: os.Getenv("DB_NAME"),
 	}
 
-	config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
+	c.Config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.Config.Database.Username, c.Config.Database.Password, c.Config.Database.Host, c.Config.Database.Port, c.Config.Database.Database)
 
 	restPortString := os.Getenv("PORT")
 	if restPortString == "" {
@@ -43,8 +42,7 @@ func (c *configService) loadConfig() {
 		panic(err.Error())
 	}
 
-	config.Database.RestPort = restPort
-	c.Config = config
+	c.Config.Database.RestPort = restPort
 }
 
 func (c *configService) GetConfig() *model.Config {

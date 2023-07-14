@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/go-gormigrate/gormigrate/v2"
-	"gorm.io/driver/postgres"
+	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
 	"log"
@@ -13,7 +13,7 @@ import (
 func main() {
 	cfg := config.NewConfigService()
 
-	db, err := gorm.Open(postgres.Open(cfg.GetConfig().Database.ConnString), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(cfg.GetConfig().Database.ConnString), &gorm.Config{
 		SkipDefaultTransaction: true,
 		NamingStrategy: schema.NamingStrategy{
 			NoLowerCase: true,
