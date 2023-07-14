@@ -1,0 +1,94 @@
+definitions:
+  dto.ChatMessageRequest:
+    properties:
+      chat_id:
+        type: integer
+      question:
+        type: string
+      user_id:
+        type: string
+    type: object
+  dto.ChatMessageResponse:
+    properties:
+      answer:
+        type: string
+    type: object
+  dto.ChatResponse:
+    properties:
+      chat_id:
+        type: integer
+    type: object
+info:
+  contact:
+    email: support@swagger.io
+    name: API Support
+    url: http://www.swagger.io/support
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+paths:
+  /smart-chat/v1/chat:
+    post:
+      consumes:
+      - application/json
+      description: create chat
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ChatResponse'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: create chat
+      tags:
+      - Action
+  /smart-chat/v1/chat-message:
+    post:
+      consumes:
+      - application/json
+      description: chat-message
+      parameters:
+      - description: chatMessageRequest
+        in: body
+        name: chatMessageRequest
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ChatMessageRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: Created
+          schema:
+            $ref: '#/definitions/dto.ChatMessageResponse'
+        "500":
+          description: Internal Server Error
+          schema: {}
+      summary: chat-message
+      tags:
+      - Action
+  /smart-chat/v1/health:
+    get:
+      consumes:
+      - application/json
+      description: healthcheck router
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            type: string
+      summary: healthcheck router
+      tags:
+      - Healthcheck
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

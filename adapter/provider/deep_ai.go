@@ -20,7 +20,7 @@ func NewDeepAiProvider(cfg *model.Config) *DeepAiProvider {
 	}
 }
 
-func (t *DeepAiProvider) GetConnection(ask *dto.Ask) (*dto.Answer, error) {
+func (t *DeepAiProvider) CallIA(ask *dto.Ask) (*dto.Answer, error) {
 	client := &http.Client{}
 
 	req, err := http.NewRequest("POST", t.config.DeepAi.URL, strings.NewReader("text="+ask.Text))
@@ -35,21 +35,21 @@ func (t *DeepAiProvider) GetConnection(ask *dto.Ask) (*dto.Answer, error) {
 	resp, err := client.Do(req)
 	if err != nil {
 		fmt.Println("Error sending request:", err)
-		return
+		return nil, err
 	}
 	defer resp.Body.Close()
 
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		fmt.Println("Error reading response:", err)
-		return
+		return nil, err
 	}
 
 	asnwer := dto.Answer{}
 
 	if err = json.Unmarshal(body, &asnwer); err != nil {
 		fmt.Println("Error unmarshalling response:", err)
-		return
+		return nil, err
 	}
 
 	return &asnwer, nil
