@@ -21,6 +21,14 @@ func NewConfigService() *configService {
 func (c *configService) loadConfig() {
 	config := &model.Config{}
 
+	config.Database = model.Database{
+		Username: os.Getenv("DB_USERNAME"),
+		Password: os.Getenv("DB_PASSWORD"),
+		Host:     os.Getenv("DB_HOST"),
+		Port:     os.Getenv("DB_PORT"),
+		Database: os.Getenv("DB_NAME"),
+	}
+
 	config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
 
 	restPortString := os.Getenv("PORT")

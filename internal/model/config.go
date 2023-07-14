@@ -3,6 +3,8 @@ package model
 type Config struct {
 	DeepAi   DeepAi
 	Database Database
+	RestPort int
+	BasePath string
 }
 
 type DeepAi struct {
