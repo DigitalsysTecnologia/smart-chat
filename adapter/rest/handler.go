@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"net/http"
 	"smart-chat/docs"
 	"smart-chat/internal/model"
@@ -43,18 +45,19 @@ func NewRestServer(cfg *model.Config, controllers *Controllers) *ServerRest {
 
 func (s *ServerRest) registerRoutes() {
 	basePath := s.Engine.Group(s.config.BasePath)
+	basePath.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	{
-		basePath.GET("/health", s.controllers.heathCheckController.HealthCheck)
+		basePath.GET("/health", s.controllers.HeathCheckController.HealthCheck)
 	}
 
 	chatGroup := basePath.Group("/chat")
 	{
-		chatGroup.POST("", s.controllers.chatController.Create)
+		chatGroup.POST("", s.controllers.ChatController.Create)
 	}
 
 	chatMessageGroup := basePath.Group("/chat-message")
 	{
-		chatMessageGroup.POST("", s.controllers.chatMessageController.Create)
+		chatMessageGroup.POST("", s.controllers.ChatMessageController.Create)
 	}
 
 }

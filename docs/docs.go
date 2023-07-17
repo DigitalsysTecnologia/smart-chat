@@ -25,71 +25,6 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/smart-chat/v1/chat": {
-            "post": {
-                "description": "create chat",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Action"
-                ],
-                "summary": "create chat",
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ChatResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
-        "/smart-chat/v1/chat-message": {
-            "post": {
-                "description": "chat-message",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Action"
-                ],
-                "summary": "chat-message",
-                "parameters": [
-                    {
-                        "description": "chatMessageRequest",
-                        "name": "chatMessageRequest",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/dto.ChatMessageRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "201": {
-                        "description": "Created",
-                        "schema": {
-                            "$ref": "#/definitions/dto.ChatMessageResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Internal Server Error",
-                        "schema": {}
-                    }
-                }
-            }
-        },
         "/smart-chat/v1/health": {
             "get": {
                 "description": "healthcheck router",
@@ -112,10 +47,69 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/chat": {
+            "post": {
+                "description": "create chat",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Action"
+                ],
+                "summary": "create chat",
+                "responses": {
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
+        },
+        "/v1/chat-message": {
+            "post": {
+                "description": "chat-message",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Action"
+                ],
+                "summary": "chat-message",
+                "parameters": [
+                    {
+                        "description": "chatMessageRequest",
+                        "name": "chatMessageRequest",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/smart-chat_internal_dto.ChatMessageRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": {
+                        "description": "Created",
+                        "schema": {
+                            "$ref": "#/definitions/smart-chat_internal_dto.ChatMessageResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Internal Server Error",
+                        "schema": {}
+                    }
+                }
+            }
         }
     },
     "definitions": {
-        "dto.ChatMessageRequest": {
+        "smart-chat_internal_dto.ChatMessageRequest": {
             "type": "object",
             "properties": {
                 "chat_id": {
@@ -124,24 +118,28 @@ const docTemplate = `{
                 "question": {
                     "type": "string"
                 },
+                "question_date": {
+                    "type": "string"
+                },
+                "response": {
+                    "type": "string"
+                },
+                "response_date": {
+                    "type": "string"
+                },
+                "response_id": {
+                    "type": "string"
+                },
                 "user_id": {
                     "type": "string"
                 }
             }
         },
-        "dto.ChatMessageResponse": {
+        "smart-chat_internal_dto.ChatMessageResponse": {
             "type": "object",
             "properties": {
                 "answer": {
                     "type": "string"
-                }
-            }
-        },
-        "dto.ChatResponse": {
-            "type": "object",
-            "properties": {
-                "chat_id": {
-                    "type": "integer"
                 }
             }
         }

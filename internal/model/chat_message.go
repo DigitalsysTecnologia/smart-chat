@@ -14,6 +14,8 @@ type ChatMessage struct {
 	ResponseDate time.Time `json:"response_date" gorm:"type:datetime"`
 	ChatID       uint64    `json:"chat_id"`
 	Chat         Chat      `json:"chat" gorm:"foreignKey:ChatID"`
+	CreatedAt    time.Time `json:"created_at"`
+	UpdatedAt    time.Time `json:"updated_at"`
 }
 
 func (ChatMessage) TableName() string {

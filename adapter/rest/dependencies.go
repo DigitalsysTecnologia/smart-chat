@@ -6,9 +6,9 @@ import (
 )
 
 type Controllers struct {
-	chatMessageController chatMessageController
-	chatController        chatController
-	heathCheckController  heathCheckController
+	ChatController        chatController
+	ChatMessageController chatMessageController
+	HeathCheckController  heathCheckController
 }
 
 type chatMessageController interface {

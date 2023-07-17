@@ -19,6 +19,12 @@ swag-install: ## Install swag
 	@go get -u github.com/swaggo/swag/cmd/swag
 	@echo "--------------------------------------------"
 
+swag-run: ## Install swag
+	@echo "install swag..."
+	@echo "--------------------------------------------"
+	@go swag init --parseDependency -g ./cmd/api/main.go
+	@echo "--------------------------------------------"
+
 db-up: ## Start database
 	@echo "up database..."
 	@echo "--------------------------------------------"

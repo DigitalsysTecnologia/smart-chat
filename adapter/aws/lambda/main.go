@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"github.com/apex/gateway"
+	"log"
 	"smart-chat/adapter/database"
 	"smart-chat/adapter/rest"
 	"smart-chat/internal/config"
@@ -11,16 +12,8 @@ import (
 	"smart-chat/internal/service"
 )
 
-// @contact.name API Support
-// @contact.url http://www.swagger.io/support
-// @contact.email support@swagger.io
-// @license.name Apache 2.0
-// @license.url http://www.apache.org/licenses/LICENSE-2.0.html
-// @termsOfService http://swagger.io/terms/
-// @securityDefinitions.apikey ApiKeyAuth
-// @in header
-// @name Authorization
 func main() {
+	addr := ":80"
 	cfg := config.NewConfigService().GetConfig()
 
 	db, err := database.NewDatabaseProvider(cfg).GetConnection()
@@ -48,7 +41,7 @@ func main() {
 			HeathCheckController:  v1.NewHealthCheckController(),
 		},
 	)
-	fmt.Println("Server is running on port 8888")
-	serverRest.StartListening()
+
+	log.Fatal(gateway.ListenAndServe(addr, serverRest.Engine))
 
 }

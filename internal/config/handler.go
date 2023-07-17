@@ -30,6 +30,8 @@ func (c *configService) loadConfig() {
 		},
 	}
 
+	config.BasePath = "smart-chat"
+
 	config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
 
 	restPortString := os.Getenv("REST_PORT")

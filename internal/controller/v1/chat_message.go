@@ -25,8 +25,8 @@ func NewChatMessageController(chatMessageFacade chatMessageFacade) *chatMessageC
 // @Produce json
 // @Success 201 {object} dto.ChatMessageResponse
 // @Failure 500 {object} error
-// @Router /smart-chat/v1/chat-message [post]
-func (c *chatMessageController) CreateChatMessage(g *gin.Context) {
+// @Router /v1/chat-message [post]
+func (c *chatMessageController) Create(g *gin.Context) {
 
 	ctx := context.Background()
 
