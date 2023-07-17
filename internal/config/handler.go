@@ -20,19 +20,21 @@ func NewConfigService() *configService {
 
 func (c *configService) loadConfig() {
 
-	c.Config.Database = model.Database{
-		Username: os.Getenv("DB_USERNAME"),
-		Password: os.Getenv("DB_PASSWORD"),
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
-		Database: os.Getenv("DB_NAME"),
+	config := &model.Config{
+		Database: model.Database{
+			Username: os.Getenv("DB_USERNAME"),
+			Password: os.Getenv("DB_PASSWORD"),
+			Host:     os.Getenv("DB_HOST"),
+			Port:     os.Getenv("DB_PORT"),
+			Database: os.Getenv("DB_NAME"),
+		},
 	}
 
-	c.Config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", c.Config.Database.Username, c.Config.Database.Password, c.Config.Database.Host, c.Config.Database.Port, c.Config.Database.Database)
+	config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
 
-	restPortString := os.Getenv("PORT")
+	restPortString := os.Getenv("REST_PORT")
 	if restPortString == "" {
-		restPortString = "8030"
+		restPortString = "8888"
 	}
 
 	fmt.Println("pass port: ", restPortString)
@@ -42,7 +44,8 @@ func (c *configService) loadConfig() {
 		panic(err.Error())
 	}
 
-	c.Config.Database.RestPort = restPort
+	config.Database.RestPort = restPort
+	c.Config = config
 }
 
 func (c *configService) GetConfig() *model.Config {

@@ -3,7 +3,6 @@ package facade
 import (
 	"context"
 	"smart-chat/internal/dto"
-	"smart-chat/internal/model"
 )
 
 type chatMessageFacade struct {
@@ -26,9 +25,10 @@ func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRe
 	if err != nil {
 		return nil, err
 	}
+	chatMessageRequest.ResponseID = answer.ID
+	chatMessageRequest.Response = answer.Output
 
-	chatMessage := &model.ChatMessage{}
-	chatMessage.ParseFromChatMessageRequestAndAnswer(chatMessageRequest, answer)
+	chatMessage := chatMessageRequest.ParseFromChatMessageRequestAndAnswer()
 
 	_, err = c.chatMessageService.CreateChatMessage(ctx, chatMessage)
 	if err != nil {

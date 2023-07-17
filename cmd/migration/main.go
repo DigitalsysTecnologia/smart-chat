@@ -13,7 +13,7 @@ import (
 func main() {
 	cfg := config.NewConfigService()
 
-	db, err := gorm.Open(mysql.Open(cfg.GetConfig().Database.ConnString), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(cfg.GetConfig().Database.DbConnString), &gorm.Config{
 		SkipDefaultTransaction: true,
 		NamingStrategy: schema.NamingStrategy{
 			NoLowerCase: true,
