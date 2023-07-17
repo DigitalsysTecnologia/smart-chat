@@ -10,9 +10,10 @@ type chatMessageFacade struct {
 	deepAiProvider     deepAiProvider
 }
 
-func NewChatMessageFacade(chatMessageService chatMessageService) *chatMessageFacade {
+func NewChatMessageFacade(chatMessageService chatMessageService, deepAiProvider deepAiProvider) *chatMessageFacade {
 	return &chatMessageFacade{
 		chatMessageService: chatMessageService,
+		deepAiProvider:     deepAiProvider,
 	}
 }
 
@@ -25,10 +26,11 @@ func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRe
 	if err != nil {
 		return nil, err
 	}
-	chatMessageRequest.ResponseID = answer.ID
-	chatMessageRequest.Response = answer.Output
 
 	chatMessage := chatMessageRequest.ParseFromChatMessageRequestAndAnswer()
+
+	chatMessage.ResponseID = answer.ID
+	chatMessage.Response = answer.Output
 
 	_, err = c.chatMessageService.CreateChatMessage(ctx, chatMessage)
 	if err != nil {

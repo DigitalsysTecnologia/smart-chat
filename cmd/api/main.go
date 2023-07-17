@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"smart-chat/adapter/database"
+	"smart-chat/adapter/provider"
 	"smart-chat/adapter/rest"
 	"smart-chat/internal/config"
 	v1 "smart-chat/internal/controller/v1"
@@ -34,8 +35,10 @@ func main() {
 	chatService := service.NewChatService(chatRepository)
 	chatMessageService := service.NewChatMessageService(chatMessageRepository)
 
+	deepAiProvider := provider.NewDeepAiProvider(cfg)
+
 	chatFacade := facade.NewChatFacade(chatService)
-	chatMessageFacade := facade.NewChatMessageFacade(chatMessageService)
+	chatMessageFacade := facade.NewChatMessageFacade(chatMessageService, deepAiProvider)
 
 	chatController := v1.NewChatController(chatFacade)
 	chatMessageController := v1.NewChatMessageController(chatMessageFacade)
@@ -48,7 +51,7 @@ func main() {
 			HeathCheckController:  v1.NewHealthCheckController(),
 		},
 	)
-	fmt.Println("Server is running on port 8888")
+	fmt.Println("Server is running on port: ", cfg.RestPort)
 	serverRest.StartListening()
 
 }

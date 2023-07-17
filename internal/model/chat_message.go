@@ -19,5 +19,5 @@ type ChatMessage struct {
 }
 
 func (ChatMessage) TableName() string {
-	return "ChatMessage"
+	return "chat_message"
 }

@@ -17,15 +17,16 @@ func NewChatMessageController(chatMessageFacade chatMessageFacade) *chatMessageC
 	}
 }
 
-// @Summary chat-message
-// @Description chat-message
-// @Tags Action
+// Create - create a chat-message
+// @Summary - create a chat-message
+// @Description - create a chat-message
+// @Tags - Chat-Message
 // @Accept json
 // @Param chatMessageRequest body dto.ChatMessageRequest true "chatMessageRequest"
 // @Produce json
 // @Success 201 {object} dto.ChatMessageResponse
-// @Failure 500 {object} error
-// @Router /v1/chat-message [post]
+// @Router /smart-chat/v1/chat-message [post]
+// @Security ApiKeyAuth
 func (c *chatMessageController) Create(g *gin.Context) {
 
 	ctx := context.Background()

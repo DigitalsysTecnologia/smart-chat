@@ -16,20 +16,23 @@ func NewChatController(chatFacade chatFacade) *chatController {
 	}
 }
 
-// @Summary create chat
-// @Description create chat
-// @Tags Action
+// Create - create a chat
+// @Summary - create a chat
+// @Description - create a chat
+// @Tags - Chat
 // @Accept json
 // @Produce json
-// @Failure 500 {object} error
-// @Router /v1/chat [post]
+// @Success 201 {object} dto.ChatResponse
+// @Router /smart-chat/v1/chat [post]
+// @Security ApiKeyAuth
 func (c *chatController) Create(g *gin.Context) {
 
 	ctx := context.Background()
 
 	chat, err := c.chatFacade.CreateChat(ctx)
 	if err != nil {
-
+		g.JSON(http.StatusInternalServerError, err)
+		return
 	}
 
 	g.JSON(http.StatusCreated, chat.ChatID)

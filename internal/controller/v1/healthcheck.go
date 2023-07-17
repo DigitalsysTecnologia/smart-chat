@@ -12,9 +12,10 @@ func NewHealthCheckController() *healthCheckController {
 	return &healthCheckController{}
 }
 
-// @Summary healthcheck router
-// @Description healthcheck router
-// @Tags Healthcheck
+// HealthCheck - healthcheck
+// @Summary - healthcheck
+// @Description - healthcheck
+// @Tags - Health
 // @Accept json
 // @Produce json
 // @Success 200 {string} string "OK"

@@ -30,7 +30,6 @@ func NewRestServer(cfg *model.Config, controllers *Controllers) *ServerRest {
 	docs.SwaggerInfo.Description = "API para comunicação com o sistema DeepAI"
 	docs.SwaggerInfo.Version = "1.0"
 	docs.SwaggerInfo.Schemes = []string{"https", "http"}
-	docs.SwaggerInfo.BasePath = cfg.BasePath
 
 	server := &ServerRest{
 		Engine:      engine,
@@ -44,20 +43,20 @@ func NewRestServer(cfg *model.Config, controllers *Controllers) *ServerRest {
 }
 
 func (s *ServerRest) registerRoutes() {
-	basePath := s.Engine.Group(s.config.BasePath)
-	basePath.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+	v1 := s.Engine.Group("smart-chat/v1")
 	{
-		basePath.GET("/health", s.controllers.HeathCheckController.HealthCheck)
-	}
+		v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+		v1.GET("/health", s.controllers.HeathCheckController.HealthCheck)
 
-	chatGroup := basePath.Group("/chat")
-	{
-		chatGroup.POST("", s.controllers.ChatController.Create)
-	}
+		chatGroup := v1.Group("/chat")
+		{
+			chatGroup.POST("", s.controllers.ChatController.Create)
+		}
 
-	chatMessageGroup := basePath.Group("/chat-message")
-	{
-		chatMessageGroup.POST("", s.controllers.ChatMessageController.Create)
+		chatMessageGroup := v1.Group("/chat-message")
+		{
+			chatMessageGroup.POST("", s.controllers.ChatMessageController.Create)
+		}
 	}
 
 }

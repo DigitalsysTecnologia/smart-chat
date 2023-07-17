@@ -28,9 +28,11 @@ func (c *configService) loadConfig() {
 			Port:     os.Getenv("DB_PORT"),
 			Database: os.Getenv("DB_NAME"),
 		},
+		DeepAi: model.DeepAi{
+			URL:    os.Getenv("DEEP_AI_URL"),
+			ApiKey: os.Getenv("DEEP_AI_KEY"),
+		},
 	}
-
-	config.BasePath = "smart-chat"
 
 	config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)
 
@@ -46,7 +48,7 @@ func (c *configService) loadConfig() {
 		panic(err.Error())
 	}
 
-	config.Database.RestPort = restPort
+	config.RestPort = restPort
 	c.Config = config
 }
 
