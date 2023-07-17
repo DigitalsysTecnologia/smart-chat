@@ -1,29 +1,21 @@
 package model
 
 import (
-	"smart-chat/internal/dto"
 	"time"
 )
 
 type ChatMessage struct {
-	ID           int64     `json:"id"`
-	UserID       string    `json:"user_id"`
-	Question     string    `json:"question"`
-	ResponseID   string    `json:"response_id"`
-	Response     string    `json:"response"`
-	QuestionDate time.Time `json:"question_date"`
-	ResponseDate time.Time `json:"response_date"`
+	ID           int64     `json:"id" gorm:"primaryKey"`
+	UserID       string    `json:"user_id" gorm:"type:varchar(191)"`
+	Question     string    `json:"question" gorm:"type:varchar(300)"`
+	ResponseID   string    `json:"response_id" gorm:"type:varchar(191)"`
+	Response     string    `json:"response" gorm:"type:varchar(300)"`
+	QuestionDate time.Time `json:"question_date" gorm:"type:datetime"`
+	ResponseDate time.Time `json:"response_date" gorm:"type:datetime"`
 	ChatID       uint64    `json:"chat_id"`
-	Chat         Chat      `json:"chat"`
+	Chat         Chat      `json:"chat" gorm:"foreignKey:ChatID"`
 }
 
-func (c *ChatMessage) ParseFromChatMessageRequestAndAnswer(chatMessageRequest *dto.ChatMessageRequest, answer *dto.Answer) {
-	c.UserID = chatMessageRequest.UserID
-	c.Question = chatMessageRequest.Question
-	c.ResponseID = answer.ID
-	c.Response = answer.Output
-	c.QuestionDate = time.Now()
-	c.ResponseDate = time.Now()
-	c.ChatID = chatMessageRequest.ChatID
-
+func (ChatMessage) TableName() string {
+	return "ChatMessage"
 }
