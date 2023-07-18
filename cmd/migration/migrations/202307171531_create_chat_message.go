@@ -12,13 +12,13 @@ func init() {
 
 			sql := `CREATE TABLE IF NOT EXISTS chat_message(
 					id INT AUTO_INCREMENT PRIMARY KEY,
+					chat_id int,
 					user_id VARCHAR(191),
-					question VARCHAR(300),
+					question LONGTEXT,
 					response_id VARCHAR(191),
-					Response VARCHAR(300),
+					Response LONGTEXT,
 					question_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 					response_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					chat_id int,
     				created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 					FOREIGN KEY (chat_id) REFERENCES chat(id)

@@ -18,9 +18,10 @@ type ServerRest struct {
 	Engine      *gin.Engine
 	config      *model.Config
 	controllers *Controllers
+	middlewares *Middlewares
 }
 
-func NewRestServer(cfg *model.Config, controllers *Controllers) *ServerRest {
+func NewRestServer(cfg *model.Config, controllers *Controllers, middlewares *Middlewares) *ServerRest {
 	engine := gin.New()
 	engine.Use(gin.Logger())
 	engine.Use(gin.Recovery())
@@ -35,6 +36,7 @@ func NewRestServer(cfg *model.Config, controllers *Controllers) *ServerRest {
 		Engine:      engine,
 		config:      cfg,
 		controllers: controllers,
+		middlewares: middlewares,
 	}
 
 	server.registerRoutes()
@@ -43,7 +45,7 @@ func NewRestServer(cfg *model.Config, controllers *Controllers) *ServerRest {
 }
 
 func (s *ServerRest) registerRoutes() {
-	v1 := s.Engine.Group("smart-chat/v1")
+	v1 := s.Engine.Group("smart-chat/v1", s.middlewares.LoggerMiddleware.GenerateLoggerID)
 	{
 		v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		v1.GET("/health", s.controllers.HeathCheckController.HealthCheck)

@@ -11,6 +11,10 @@ type Controllers struct {
 	HeathCheckController  heathCheckController
 }
 
+type Middlewares struct {
+	LoggerMiddleware loggerMiddleware
+}
+
 type chatMessageController interface {
 	Create(c *gin.Context)
 }
@@ -21,4 +25,8 @@ type chatController interface {
 
 type heathCheckController interface {
 	HealthCheck(c *gin.Context)
+}
+
+type loggerMiddleware interface {
+	GenerateLoggerID(c *gin.Context)
 }

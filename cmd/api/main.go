@@ -8,6 +8,7 @@ import (
 	"smart-chat/internal/config"
 	v1 "smart-chat/internal/controller/v1"
 	"smart-chat/internal/facade"
+	"smart-chat/internal/middleware"
 	"smart-chat/internal/repository"
 	"smart-chat/internal/service"
 )
@@ -22,6 +23,10 @@ import (
 // @in header
 // @name Authorization
 func main() {
+
+	sysLogger := provider.NewLogger()
+	defer sysLogger.ZapSync()
+
 	cfg := config.NewConfigService().GetConfig()
 
 	db, err := database.NewDatabaseProvider(cfg).GetConnection()
@@ -29,19 +34,21 @@ func main() {
 		panic(err)
 	}
 
-	chatRepository := repository.NewChatRepository(db)
-	chatMessageRepository := repository.NewChatMessageRepository(db)
+	chatRepository := repository.NewChatRepository(db, sysLogger)
+	chatMessageRepository := repository.NewChatMessageRepository(db, sysLogger)
 
-	chatService := service.NewChatService(chatRepository)
-	chatMessageService := service.NewChatMessageService(chatMessageRepository)
+	chatService := service.NewChatService(chatRepository, sysLogger)
+	chatMessageService := service.NewChatMessageService(chatMessageRepository, sysLogger)
 
-	deepAiProvider := provider.NewDeepAiProvider(cfg)
+	deepAiProvider := provider.NewDeepAiProvider(cfg, sysLogger)
 
-	chatFacade := facade.NewChatFacade(chatService)
-	chatMessageFacade := facade.NewChatMessageFacade(chatMessageService, deepAiProvider)
+	chatFacade := facade.NewChatFacade(chatService, sysLogger)
+	chatMessageFacade := facade.NewChatMessageFacade(chatMessageService, chatService, deepAiProvider, sysLogger)
 
-	chatController := v1.NewChatController(chatFacade)
-	chatMessageController := v1.NewChatMessageController(chatMessageFacade)
+	chatController := v1.NewChatController(chatFacade, sysLogger)
+	chatMessageController := v1.NewChatMessageController(chatMessageFacade, sysLogger)
+
+	logger := middleware.NewLoggerMiddleware()
 
 	serverRest := rest.NewRestServer(
 		cfg,
@@ -49,6 +56,9 @@ func main() {
 			ChatController:        chatController,
 			ChatMessageController: chatMessageController,
 			HeathCheckController:  v1.NewHealthCheckController(),
+		},
+		&rest.Middlewares{
+			LoggerMiddleware: logger,
 		},
 	)
 	fmt.Println("Server is running on port: ", cfg.RestPort)

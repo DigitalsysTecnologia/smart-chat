@@ -9,6 +9,7 @@ import (
 type chatService interface {
 	CreateChat(ctx context.Context) (*model.Chat, error)
 	UpdateChat(ctx context.Context, chat *model.Chat) (*model.Chat, error)
+	GetChatByID(ctx context.Context, chatID uint64) (*model.Chat, error)
 }
 
 type chatMessageService interface {
@@ -16,5 +17,5 @@ type chatMessageService interface {
 }
 
 type deepAiProvider interface {
-	CallIA(ask *dto.Ask) (*dto.Answer, error)
+	CallIA(ctx context.Context, text string) (*dto.Answer, error)
 }
