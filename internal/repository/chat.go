@@ -21,10 +21,10 @@ func NewChatRepository(db *gorm.DB, logger *provider.SystemLogger) *chatReposito
 	}
 }
 
-func (c *chatRepository) CreateChat(ctx context.Context) (*model.Chat, error) {
+func (c *chatRepository) Create(ctx context.Context) (*model.Chat, error) {
 	requestId := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("CreateChat", "requestID", requestId).
+	c.logger.NewLog("Create", "requestID", requestId).
 		Debug().
 		Phase("Repository").
 		Exe()
@@ -48,7 +48,7 @@ func (c *chatRepository) CreateChat(ctx context.Context) (*model.Chat, error) {
 		return nil, err
 	}
 
-	c.logger.NewLog("CreateChat", "requestID", requestId,
+	c.logger.NewLog("Create", "requestID", requestId,
 		"Model chat", chat).
 		Debug().
 		Phase("Repository").
@@ -57,10 +57,10 @@ func (c *chatRepository) CreateChat(ctx context.Context) (*model.Chat, error) {
 	return chat, nil
 }
 
-func (c *chatRepository) GetChatByID(ctx context.Context, chatID uint64) (bool, *model.Chat, error) {
+func (c *chatRepository) GetByID(ctx context.Context, chatID uint64) (bool, *model.Chat, error) {
 	requestId := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("GetChatByID", "requestID", requestId).
+	c.logger.NewLog("GetByID", "requestID", requestId).
 		Debug().
 		Phase("Repository").
 		Exe()
@@ -99,17 +99,4 @@ func (c *chatRepository) GetChatByID(ctx context.Context, chatID uint64) (bool, 
 		Phase("Repository").
 		Exe()
 	return true, chat, nil
-}
-
-func (c *chatRepository) UpdateChat(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
-	db, err := c.GetConnection(ctx)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = db.Save(chat).Error; err != nil {
-		return nil, err
-	}
-
-	return chat, nil
 }

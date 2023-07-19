@@ -19,27 +19,27 @@ func NewChatService(chatRepository chatRepository, logger *provider.SystemLogger
 	}
 }
 
-func (c *ChatService) CreateChat(ctx context.Context) (*model.Chat, error) {
+func (c *ChatService) Create(ctx context.Context) (*model.Chat, error) {
 	requestID := ctx.Value("requestID").(string)
-	c.logger.NewLog("CreateChat", "requestID", requestID).
+	c.logger.NewLog("Create", "requestID", requestID).
 		Debug().
 		Phase("Service").
 		Exe()
-	return c.chatRepository.CreateChat(ctx)
+	return c.chatRepository.Create(ctx)
 }
 
-func (c *ChatService) GetChatByID(ctx context.Context, chatID uint64) (*model.Chat, error) {
+func (c *ChatService) GetByID(ctx context.Context, chatID uint64) (*model.Chat, error) {
 	requestID := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("GetChatByID", "requestID", requestID,
+	c.logger.NewLog("GetByID", "requestID", requestID,
 		"ChatID", chatID).
 		Debug().
 		Phase("Service").
 		Exe()
 
-	found, chat, err := c.chatRepository.GetChatByID(ctx, chatID)
+	found, chat, err := c.chatRepository.GetByID(ctx, chatID)
 	if err != nil {
-		c.logger.NewLog("GetChatByID: error in the get chat by id in the service", "requestID", requestID).
+		c.logger.NewLog("GetByID: error in the get chat by id in the service", "requestID", requestID).
 			Error().
 			Description("error getting chat by id: " + err.Error()).
 			Phase("Service").
@@ -48,7 +48,7 @@ func (c *ChatService) GetChatByID(ctx context.Context, chatID uint64) (*model.Ch
 	}
 
 	if !found {
-		c.logger.NewLog("GetChatByID: chat not found", "requestID", requestID).
+		c.logger.NewLog("GetByID: chat not found", "requestID", requestID).
 			Warn().
 			Description("chat not found").
 			Phase("Service").
@@ -56,15 +56,11 @@ func (c *ChatService) GetChatByID(ctx context.Context, chatID uint64) (*model.Ch
 		return nil, constants.ErrChatNotFound
 	}
 
-	c.logger.NewLog("GetChatByID", "requestID", requestID,
+	c.logger.NewLog("GetByID", "requestID", requestID,
 		"Chat", chat).
 		Debug().
 		Phase("Service").
 		Exe()
 
 	return chat, nil
-}
-
-func (c *ChatService) UpdateChat(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
-	return c.chatRepository.UpdateChat(ctx, chat)
 }

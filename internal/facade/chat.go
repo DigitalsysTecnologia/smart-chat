@@ -4,7 +4,6 @@ import (
 	"context"
 	"smart-chat/adapter/provider"
 	"smart-chat/internal/dto"
-	"smart-chat/internal/model"
 )
 
 type ChatFacade struct {
@@ -21,14 +20,14 @@ func NewChatFacade(chatService chatService, logger *provider.SystemLogger) *Chat
 
 func (c *ChatFacade) CreateChat(ctx context.Context) (*dto.ChatResponse, error) {
 	req := ctx.Value("requestID").(string)
-	c.logger.NewLog("CreateChat", "requestID", req).
+	c.logger.NewLog("Create", "requestID", req).
 		Debug().
 		Phase("Facade").
 		Exe()
 
-	chatCreated, err := c.chatService.CreateChat(ctx)
+	chatCreated, err := c.chatService.Create(ctx)
 	if err != nil {
-		c.logger.NewLog("CreateChat: error in the create chat in the facade", "requestID", req).
+		c.logger.NewLog("Create: error in the create chat in the facade", "requestID", req).
 			Error().
 			Description("error creating chat: " + err.Error()).
 			Phase("Facade").
@@ -52,8 +51,4 @@ func (c *ChatFacade) CreateChat(ctx context.Context) (*dto.ChatResponse, error) 
 		Exe()
 
 	return chatResponse, nil
-}
-
-func (c *ChatFacade) UpdateChat(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
-	return c.chatService.UpdateChat(ctx, chat)
 }

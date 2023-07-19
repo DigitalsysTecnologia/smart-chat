@@ -20,10 +20,10 @@ func NewChatMessageRepository(db *gorm.DB, logger *provider.SystemLogger) *ChatM
 	}
 }
 
-func (c *ChatMessage) CreateChatMessage(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error) {
+func (c *ChatMessage) Create(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error) {
 	requestId := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("CreateChatMessage", "requestID", requestId).
+	c.logger.NewLog("Create", "requestID", requestId).
 		Debug().
 		Phase("Repository").
 		Exe()

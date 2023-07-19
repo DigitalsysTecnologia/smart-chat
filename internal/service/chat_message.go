@@ -18,12 +18,12 @@ func NewChatMessageService(chatMessageRepository chatMessageRepository, logger *
 	}
 }
 
-func (c *ChatMessageService) CreateChatMessage(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error) {
+func (c *ChatMessageService) Create(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error) {
 	requestID := ctx.Value("requestID").(string)
-	c.logger.NewLog("CreateChatMessage", "requestID", requestID,
+	c.logger.NewLog("Create", "requestID", requestID,
 		"ChatMessage", chatMessage).
 		Debug().
 		Phase("Service").
 		Exe()
-	return c.chatMessageRepository.CreateChatMessage(ctx, chatMessage)
+	return c.chatMessageRepository.Create(ctx, chatMessage)
 }

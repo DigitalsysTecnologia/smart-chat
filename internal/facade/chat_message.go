@@ -25,15 +25,15 @@ func NewChatMessageFacade(chatMessageService chatMessageService, chatService cha
 func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRequest *dto.ChatMessageRequest) (*dto.ChatMessageResponse, error) {
 	requestID := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("CreateChatMessage", "requestID", requestID,
+	c.logger.NewLog("Create", "requestID", requestID,
 		"ChatMessageRequest", chatMessageRequest).
 		Debug().
 		Phase("Facade").
 		Exe()
 
-	_, err := c.chatService.GetChatByID(ctx, chatMessageRequest.ChatID)
+	_, err := c.chatService.GetByID(ctx, chatMessageRequest.ChatID)
 	if err != nil {
-		c.logger.NewLog("CreateChatMessage: error in the get chat by id in the facade", "requestID", requestID).
+		c.logger.NewLog("Create: error in the get chat by id in the facade", "requestID", requestID).
 			Error().
 			Description("error getting chat: " + err.Error()).
 			Phase("Facade").
@@ -48,7 +48,7 @@ func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRe
 
 	answer, err := c.deepAiProvider.CallIA(ctx, chatMessageRequest.Question)
 	if err != nil {
-		c.logger.NewLog("CreateChatMessage: error in the call IA in the facade", "requestID", requestID).
+		c.logger.NewLog("Create: error in the call IA in the facade", "requestID", requestID).
 			Error().
 			Description("error calling IA: " + err.Error()).
 			Phase("Facade").
@@ -69,9 +69,9 @@ func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRe
 		Phase("Facade").
 		Exe()
 
-	_, err = c.chatMessageService.CreateChatMessage(ctx, chatMessage)
+	_, err = c.chatMessageService.Create(ctx, chatMessage)
 	if err != nil {
-		c.logger.NewLog("CreateChatMessage: error in the create chat message in the facade", "requestID", requestID).
+		c.logger.NewLog("Create: error in the create chat message in the facade", "requestID", requestID).
 			Error().
 			Description("error creating chat message: " + err.Error()).
 			Phase("Facade").

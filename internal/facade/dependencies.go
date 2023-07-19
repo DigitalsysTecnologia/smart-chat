@@ -7,13 +7,12 @@ import (
 )
 
 type chatService interface {
-	CreateChat(ctx context.Context) (*model.Chat, error)
-	UpdateChat(ctx context.Context, chat *model.Chat) (*model.Chat, error)
-	GetChatByID(ctx context.Context, chatID uint64) (*model.Chat, error)
+	Create(ctx context.Context) (*model.Chat, error)
+	GetByID(ctx context.Context, chatID uint64) (*model.Chat, error)
 }
 
 type chatMessageService interface {
-	CreateChatMessage(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error)
+	Create(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error)
 }
 
 type deepAiProvider interface {
