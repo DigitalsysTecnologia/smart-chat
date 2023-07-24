@@ -5,18 +5,18 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"net/http"
-	"smart-chat/adapter/provider"
 	"smart-chat/internal/constants"
 	"smart-chat/internal/dto"
 )
 
 type chatMessageController struct {
 	chatMessageFacade chatMessageFacade
-	logger            *provider.SystemLogger
+	logger            *zap.Logger
 }
 
-func NewChatMessageController(chatMessageFacade chatMessageFacade, logger *provider.SystemLogger) *chatMessageController {
+func NewChatMessageController(chatMessageFacade chatMessageFacade, logger *zap.Logger) *chatMessageController {
 	return &chatMessageController{
 		chatMessageFacade: chatMessageFacade,
 		logger:            logger,
@@ -41,58 +41,45 @@ func (c *chatMessageController) Create(g *gin.Context) {
 		requestID = uuid.New().String()
 	}
 
-	c.logger.NewLog("Call route create chat-message", "requestID", requestID.(string)).
-		Debug().
-		Description("Call route create chat").
-		Phase("Controller").
-		Request()
+	c.logger.Debug("Call route Create chat-message",
+		zap.String("requestID", requestID.(string)),
+		zap.String("phase", "Controller"))
 	ctx := context.WithValue(context.Background(), "requestID", requestID)
 	chatMessageRequest := &dto.ChatMessageRequest{}
 
 	if err := g.BindJSON(chatMessageRequest); err != nil {
-		c.logger.NewLog("Error bind json", "requestID", requestID.(string)).
-			Error().
-			Description("Error bind json: " + err.Error()).
-			Phase("Controller").
-			Response()
+		c.logger.Error("Error bind json", zap.String("requestID", requestID.(string)),
+			zap.Error(err),
+			zap.String("phase", "Controller"))
 		g.JSON(http.StatusBadRequest, &dto.Error{Message: err.Error()})
 		return
 	}
 
-	c.logger.NewLog("Success bind json", "requestID", requestID.(string),
-		"chatMessageRequest", chatMessageRequest).
-		Debug().
-		Description("Success bind json").
-		Phase("Controller").
-		Request()
+	c.logger.Debug("Success bind json", zap.String("requestID", requestID.(string)),
+		zap.Any("chatMessageRequest", chatMessageRequest),
+		zap.String("phase", "Controller"))
 
 	chatMessage, err := c.chatMessageFacade.CreateChatMessage(ctx, chatMessageRequest)
 	if err != nil {
 		switch {
 		case errors.Is(err, constants.ErrChatNotFound):
-			c.logger.NewLog("Error chat not found", "requestID", requestID.(string)).
-				Error().
-				Description("Error chat not found: " + err.Error()).
-				Phase("Controller").
-				Response()
+			c.logger.Error("Error create chat-message", zap.String("requestID", requestID.(string)),
+				zap.Error(err),
+				zap.String("phase", "Controller"))
 			g.JSON(http.StatusNotFound, &dto.Error{Message: err.Error()})
 			return
 		default:
-			c.logger.NewLog("Error create chat-message", "requestID", requestID.(string)).
-				Error().
-				Description("Error create chat-message: " + err.Error()).
-				Phase("Controller").
-				Response()
+			c.logger.Error("Error create chat-message", zap.String("requestID", requestID.(string)),
+				zap.Error(err),
+				zap.String("phase", "Controller"))
 			g.JSON(http.StatusInternalServerError, &dto.Error{Message: err.Error()})
 		}
 		return
 	}
 
-	c.logger.NewLog("Success create chat-message", "requestID", requestID.(string)).
-		Debug().
-		Description("Success create chat-message").
-		Phase("Controller").
-		Response()
+	c.logger.Debug("Success create chat-message", zap.String("requestID", requestID.(string)),
+		zap.Any("chatMessage", chatMessage),
+		zap.String("phase", "Controller"))
 
 	g.JSON(http.StatusCreated, chatMessage)
 }

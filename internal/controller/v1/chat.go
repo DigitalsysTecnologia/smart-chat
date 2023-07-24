@@ -4,17 +4,17 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
+	"go.uber.org/zap"
 	"net/http"
-	"smart-chat/adapter/provider"
 	"smart-chat/internal/dto"
 )
 
 type chatController struct {
 	chatFacade chatFacade
-	logger     *provider.SystemLogger
+	logger     *zap.Logger
 }
 
-func NewChatController(chatFacade chatFacade, logger *provider.SystemLogger) *chatController {
+func NewChatController(chatFacade chatFacade, logger *zap.Logger) *chatController {
 	return &chatController{
 		chatFacade: chatFacade,
 		logger:     logger,
@@ -36,30 +36,27 @@ func (c *chatController) Create(g *gin.Context) {
 	if !found {
 		requestID = uuid.New().String()
 	}
-	c.logger.NewLog("Call route create chat", "requestID", requestID.(string)).
-		Debug().
-		Description("Call route create chat").
-		Phase("Controller").
-		Request()
+
+	c.logger.Debug("Call route Create chat",
+		zap.String("requestID", requestID.(string)),
+		zap.String("phase", "Controller"))
 
 	ctx := context.WithValue(context.Background(), "requestID", requestID)
 
 	chat, err := c.chatFacade.CreateChat(ctx)
 	if err != nil {
-		c.logger.NewLog("Error create chat", "requestID", requestID.(string)).
-			Error().
-			Description("Error create chat: " + err.Error()).
-			Phase("Controller").
-			Response()
+		c.logger.Error("Error create chat",
+			zap.String("requestID", requestID.(string)),
+			zap.Error(err),
+			zap.String("phase", "Controller"))
 		g.JSON(http.StatusInternalServerError, &dto.Error{Message: err.Error()})
 		return
 	}
 
-	c.logger.NewLog("Success create chat", "requestID", requestID.(string)).
-		Debug().
-		Description("Success create chat").
-		Phase("Controller").
-		Response()
+	c.logger.Debug("Success create chat",
+		zap.String("requestID", requestID.(string)),
+		zap.Any("chat", chat),
+		zap.String("phase", "Controller"))
 
 	g.JSON(http.StatusCreated, chat.ChatID)
 }

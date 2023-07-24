@@ -2,7 +2,7 @@ package facade
 
 import (
 	"context"
-	"smart-chat/adapter/provider"
+	"go.uber.org/zap"
 	"smart-chat/internal/dto"
 )
 
@@ -10,10 +10,10 @@ type chatMessageFacade struct {
 	chatMessageService chatMessageService
 	chatService        chatService
 	deepAiProvider     deepAiProvider
-	logger             *provider.SystemLogger
+	logger             *zap.Logger
 }
 
-func NewChatMessageFacade(chatMessageService chatMessageService, chatService chatService, deepAiProvider deepAiProvider, logger *provider.SystemLogger) *chatMessageFacade {
+func NewChatMessageFacade(chatMessageService chatMessageService, chatService chatService, deepAiProvider deepAiProvider, logger *zap.Logger) *chatMessageFacade {
 	return &chatMessageFacade{
 		chatMessageService: chatMessageService,
 		chatService:        chatService,
@@ -25,34 +25,29 @@ func NewChatMessageFacade(chatMessageService chatMessageService, chatService cha
 func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRequest *dto.ChatMessageRequest) (*dto.ChatMessageResponse, error) {
 	requestID := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("Create", "requestID", requestID,
-		"ChatMessageRequest", chatMessageRequest).
-		Debug().
-		Phase("Facade").
-		Exe()
+	c.logger.Debug("CreateChatMessage",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Facade"))
 
 	_, err := c.chatService.GetByID(ctx, chatMessageRequest.ChatID)
 	if err != nil {
-		c.logger.NewLog("Create: error in the get chat by id in the facade", "requestID", requestID).
-			Error().
-			Description("error getting chat: " + err.Error()).
-			Phase("Facade").
-			Exe()
+		c.logger.Error("CreateChatMessage: error in the get chat in the service",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Facade"))
 		return nil, err
 	}
 
-	c.logger.NewLog("Chat was found", "requestID", requestID).
-		Debug().
-		Phase("Facade").
-		Exe()
+	c.logger.Debug("Chat was found",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Facade"))
 
 	answer, err := c.deepAiProvider.CallIA(ctx, chatMessageRequest.Question)
 	if err != nil {
-		c.logger.NewLog("Create: error in the call IA in the facade", "requestID", requestID).
-			Error().
-			Description("error calling IA: " + err.Error()).
-			Phase("Facade").
-			Exe()
+		c.logger.Error("CreateChatMessage: error in the call IA in the provider",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Facade"))
 		return nil, err
 	}
 
@@ -63,36 +58,25 @@ func (c *chatMessageFacade) CreateChatMessage(ctx context.Context, chatMessageRe
 	chatMessage.QuestionDate = answer.QuestionDate
 	chatMessage.ResponseDate = answer.ResponseDate
 
-	c.logger.NewLog("ChatMessage before creating", "requestID", requestID,
-		"ChatMessage", chatMessage).
-		Debug().
-		Phase("Facade").
-		Exe()
-
 	_, err = c.chatMessageService.Create(ctx, chatMessage)
 	if err != nil {
-		c.logger.NewLog("Create: error in the create chat message in the facade", "requestID", requestID).
-			Error().
-			Description("error creating chat message: " + err.Error()).
-			Phase("Facade").
-			Exe()
+		c.logger.Error("CreateChatMessage: error in the create chat message in the service",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Facade"))
 		return nil, err
 	}
 
-	c.logger.NewLog("ChatMessage was created", "requestID", requestID,
-		"ChatMessage", chatMessage).
-		Debug().
-		Phase("Facade").
-		Exe()
+	c.logger.Debug("ChatMessage was created",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Facade"))
 
 	chatMessageResponse := &dto.ChatMessageResponse{}
 	chatMessageResponse.ParseFromChatMessageResponse(answer)
 
-	c.logger.NewLog("ChatMessageResponse was created", "requestID", requestID,
-		"ChatMessageResponse", chatMessageResponse).
-		Debug().
-		Phase("Facade").
-		Exe()
+	c.logger.Debug("ChatMessageResponse was created",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Facade"))
 
 	return chatMessageResponse, nil
 }

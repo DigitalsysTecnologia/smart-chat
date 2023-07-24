@@ -2,17 +2,17 @@ package service
 
 import (
 	"context"
-	"smart-chat/adapter/provider"
+	"go.uber.org/zap"
 	"smart-chat/internal/constants"
 	"smart-chat/internal/model"
 )
 
 type ChatService struct {
 	chatRepository chatRepository
-	logger         *provider.SystemLogger
+	logger         *zap.Logger
 }
 
-func NewChatService(chatRepository chatRepository, logger *provider.SystemLogger) *ChatService {
+func NewChatService(chatRepository chatRepository, logger *zap.Logger) *ChatService {
 	return &ChatService{
 		chatRepository: chatRepository,
 		logger:         logger,
@@ -21,46 +21,39 @@ func NewChatService(chatRepository chatRepository, logger *provider.SystemLogger
 
 func (c *ChatService) Create(ctx context.Context) (*model.Chat, error) {
 	requestID := ctx.Value("requestID").(string)
-	c.logger.NewLog("Create", "requestID", requestID).
-		Debug().
-		Phase("Service").
-		Exe()
+	c.logger.Debug("Create chat",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Service"))
+
 	return c.chatRepository.Create(ctx)
 }
 
 func (c *ChatService) GetByID(ctx context.Context, chatID uint64) (*model.Chat, error) {
 	requestID := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("GetByID", "requestID", requestID,
-		"ChatID", chatID).
-		Debug().
-		Phase("Service").
-		Exe()
+	c.logger.Debug("GetByID chat",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Service"))
 
 	found, chat, err := c.chatRepository.GetByID(ctx, chatID)
 	if err != nil {
-		c.logger.NewLog("GetByID: error in the get chat by id in the service", "requestID", requestID).
-			Error().
-			Description("error getting chat by id: " + err.Error()).
-			Phase("Service").
-			Exe()
+		c.logger.Error("GetByID: error in the get chat in the repository",
+			zap.String("requestID", requestID),
+			zap.String("phase", "Service"))
 		return nil, err
 	}
 
 	if !found {
-		c.logger.NewLog("GetByID: chat not found", "requestID", requestID).
-			Warn().
-			Description("chat not found").
-			Phase("Service").
-			Exe()
+		c.logger.Warn("GetByID: chat not found",
+			zap.String("requestID", requestID),
+			zap.String("phase", "Service"))
 		return nil, constants.ErrChatNotFound
 	}
 
-	c.logger.NewLog("GetByID", "requestID", requestID,
-		"Chat", chat).
-		Debug().
-		Phase("Service").
-		Exe()
+	c.logger.Debug("Chat found",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Service"),
+		zap.Any("chat", chat))
 
 	return chat, nil
 }

@@ -3,17 +3,17 @@ package repository
 import (
 	"context"
 	"errors"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"smart-chat/adapter/provider"
 	"smart-chat/internal/model"
 )
 
 type chatRepository struct {
 	*BaseRepository
-	logger *provider.SystemLogger
+	logger *zap.Logger
 }
 
-func NewChatRepository(db *gorm.DB, logger *provider.SystemLogger) *chatRepository {
+func NewChatRepository(db *gorm.DB, logger *zap.Logger) *chatRepository {
 	baseRepo := NewBaseRepository(db)
 	return &chatRepository{
 		baseRepo,
@@ -24,35 +24,32 @@ func NewChatRepository(db *gorm.DB, logger *provider.SystemLogger) *chatReposito
 func (c *chatRepository) Create(ctx context.Context) (*model.Chat, error) {
 	requestId := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("Create", "requestID", requestId).
-		Debug().
-		Phase("Repository").
-		Exe()
+	c.logger.Debug("Create chat",
+		zap.String("requestID", requestId),
+		zap.String("phase", "Repository"))
 
 	db, err := c.GetConnection(ctx)
 	if err != nil {
-		c.logger.NewLog("GetConnection: get connection in the repository", "requestID", requestId).
-			Error().
-			Phase("Repository").
-			Exe()
+		c.logger.Error("GetConnection: get connection in the repository",
+			zap.String("requestID", requestId),
+			zap.Error(err),
+			zap.String("phase", "Repository"))
 		return nil, err
 	}
 
 	chat := &model.Chat{}
 	if err = db.Create(chat).Error; err != nil {
-		c.logger.NewLog("Create chat: error in the create chat in the repository", "requestID", requestId).
-			Error().
-			Description("error creating chat").
-			Phase("Repository").
-			Exe()
+		c.logger.Error("Create chat: error in the create chat in the repository",
+			zap.String("requestID", requestId),
+			zap.Error(err),
+			zap.String("phase", "Repository"))
 		return nil, err
 	}
 
-	c.logger.NewLog("Create", "requestID", requestId,
-		"Model chat", chat).
-		Debug().
-		Phase("Repository").
-		Exe()
+	c.logger.Debug("Chat created",
+		zap.String("requestID", requestId),
+		zap.String("phase", "Repository"),
+		zap.Any("chat", chat))
 
 	return chat, nil
 }
@@ -60,43 +57,37 @@ func (c *chatRepository) Create(ctx context.Context) (*model.Chat, error) {
 func (c *chatRepository) GetByID(ctx context.Context, chatID uint64) (bool, *model.Chat, error) {
 	requestId := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("GetByID", "requestID", requestId).
-		Debug().
-		Phase("Repository").
-		Exe()
+	c.logger.Debug("GetByID chat",
+		zap.String("requestID", requestId),
+		zap.String("phase", "Repository"))
 	db, err := c.GetConnection(ctx)
 	if err != nil {
-		c.logger.NewLog("GetConnection: get connection in the repository", "requestID", requestId).
-			Error().
-			Phase("Repository").
-			Exe()
+		c.logger.Error("GetConnection: get connection in the repository",
+			zap.String("requestID", requestId),
+			zap.Error(err),
+			zap.String("phase", "Repository"))
 		return false, nil, err
 	}
 
 	chat := &model.Chat{}
 
-	if err = db.Where(&model.Chat{
-		ID: chatID,
-	}).First(chat).Error; err != nil {
+	if err = db.Model(&model.Chat{}).Where(&model.Chat{ID: chatID}).First(chat).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.logger.NewLog("Chat not found: error in the found chat in the repository", "requestID", requestId).
-				Warn().
-				Description("error chat not found").
-				Phase("Repository").
-				Exe()
+			c.logger.Error("GetByID chat: chat not found",
+				zap.String("requestID", requestId),
+				zap.Error(err),
+				zap.String("phase", "Repository"))
 			return false, nil, nil
 		}
-		c.logger.NewLog("Error on get chat: error in the get chat in the repository", "requestID", requestId).
-			Error().
-			Description("error chat on get chat").
-			Phase("Repository").
-			Exe()
+		c.logger.Error("GetByID chat: error in the get chat in the repository",
+			zap.String("requestID", requestId),
+			zap.Error(err),
+			zap.String("phase", "Repository"))
 		return false, nil, err
 	}
-	c.logger.NewLog("Chat was found", "requestID", requestId,
-		"Model chat", chat).
-		Debug().
-		Phase("Repository").
-		Exe()
+	c.logger.Debug("Chat found",
+		zap.String("requestID", requestId),
+		zap.String("phase", "Repository"),
+		zap.Any("chat", chat))
 	return true, chat, nil
 }

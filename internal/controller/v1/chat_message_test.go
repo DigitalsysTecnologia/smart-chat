@@ -3,10 +3,12 @@ package v1_test
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"github.com/stretchr/testify/mock"
 	"github.com/tj/assert"
 	"net/http"
 	"net/http/httptest"
+	"smart-chat/internal/constants"
 	"smart-chat/internal/dto"
 	"testing"
 )
@@ -36,6 +38,47 @@ func TestChatMessageController_Create(t *testing.T) {
 			},
 			FacadeChatMessageError: nil,
 			expectedError:          nil,
+		},
+		{
+			name:                   "BindJsonError",
+			request:                "error_bind_json",
+			urlRequested:           "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode: http.StatusBadRequest,
+			FacadeChatMessageResponse: &dto.ChatMessageResponse{
+				Answer: "Hi",
+			},
+			FacadeChatMessageError: errors.New("json: cannot unmarshal string into Go value of type dto.ChatMessageRequest"),
+			expectedError:          errors.New("json: cannot unmarshal string into Go value of type dto.ChatMessageRequest"),
+		},
+		{
+			name: "ErrorOnCreateChatMessage_notfound",
+			request: &dto.ChatMessageRequest{
+				ChatID:   1,
+				Question: "Hello",
+				UserID:   "123",
+			},
+			urlRequested:           "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode: http.StatusNotFound,
+			FacadeChatMessageResponse: &dto.ChatMessageResponse{
+				Answer: "Hi",
+			},
+			FacadeChatMessageError: constants.ErrChatNotFound,
+			expectedError:          constants.ErrChatNotFound,
+		},
+		{
+			name: "ErrorOnCreateChatMessage_InternalServerError",
+			request: &dto.ChatMessageRequest{
+				ChatID:   1,
+				Question: "Hello",
+				UserID:   "123",
+			},
+			urlRequested:           "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode: http.StatusInternalServerError,
+			FacadeChatMessageResponse: &dto.ChatMessageResponse{
+				Answer: "Hi",
+			},
+			FacadeChatMessageError: errors.New("internal server error"),
+			expectedError:          errors.New("internal server error"),
 		},
 	}
 

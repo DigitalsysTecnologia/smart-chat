@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"go.uber.org/zap"
 	"smart-chat/adapter/database"
 	"smart-chat/adapter/provider"
 	"smart-chat/adapter/rest"
@@ -24,8 +25,7 @@ import (
 // @name Authorization
 func main() {
 
-	sysLogger := provider.NewLogger()
-	defer sysLogger.ZapSync()
+	logger := zap.NewExample()
 
 	cfg := config.NewConfigService().GetConfig()
 
@@ -34,21 +34,21 @@ func main() {
 		panic(err)
 	}
 
-	chatRepository := repository.NewChatRepository(db, sysLogger)
-	chatMessageRepository := repository.NewChatMessageRepository(db, sysLogger)
+	chatRepository := repository.NewChatRepository(db, logger)
+	chatMessageRepository := repository.NewChatMessageRepository(db, logger)
 
-	chatService := service.NewChatService(chatRepository, sysLogger)
-	chatMessageService := service.NewChatMessageService(chatMessageRepository, sysLogger)
+	chatService := service.NewChatService(chatRepository, logger)
+	chatMessageService := service.NewChatMessageService(chatMessageRepository, logger)
 
-	deepAiProvider := provider.NewDeepAiProvider(cfg, sysLogger)
+	deepAiProvider := provider.NewDeepAiProvider(cfg, logger)
 
-	chatFacade := facade.NewChatFacade(chatService, sysLogger)
-	chatMessageFacade := facade.NewChatMessageFacade(chatMessageService, chatService, deepAiProvider, sysLogger)
+	chatFacade := facade.NewChatFacade(chatService, logger)
+	chatMessageFacade := facade.NewChatMessageFacade(chatMessageService, chatService, deepAiProvider, logger)
 
-	chatController := v1.NewChatController(chatFacade, sysLogger)
-	chatMessageController := v1.NewChatMessageController(chatMessageFacade, sysLogger)
+	chatController := v1.NewChatController(chatFacade, logger)
+	chatMessageController := v1.NewChatMessageController(chatMessageFacade, logger)
 
-	logger := middleware.NewLoggerMiddleware()
+	middlewareLogger := middleware.NewLoggerMiddleware()
 
 	serverRest := rest.NewRestServer(
 		cfg,
@@ -58,7 +58,7 @@ func main() {
 			HeathCheckController:  v1.NewHealthCheckController(),
 		},
 		&rest.Middlewares{
-			LoggerMiddleware: logger,
+			LoggerMiddleware: middlewareLogger,
 		},
 	)
 	fmt.Println("Server is running on port: ", cfg.RestPort)

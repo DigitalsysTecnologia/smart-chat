@@ -6,7 +6,7 @@ require (
 	github.com/apex/gateway v1.1.2
 	github.com/gin-contrib/cors v1.4.0
 	github.com/gin-gonic/gin v1.9.1
-	github.com/go-gormigrate/gormigrate/v2 v2.1.0
+	github.com/go-gormigrate/gormigrate/v2 v2.0.2
 	github.com/google/uuid v1.3.0
 	github.com/stretchr/testify v1.8.4
 	github.com/swaggo/files v1.0.1
@@ -14,7 +14,7 @@ require (
 	github.com/swaggo/swag v1.16.1
 	github.com/tj/assert v0.0.3
 	go.uber.org/zap v1.24.0
-	gorm.io/driver/mysql v1.5.1
+	gorm.io/driver/mysql v1.4.7
 	gorm.io/gorm v1.25.2
 )
 

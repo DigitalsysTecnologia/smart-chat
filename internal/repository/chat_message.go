@@ -2,17 +2,17 @@ package repository
 
 import (
 	"context"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
-	"smart-chat/adapter/provider"
 	"smart-chat/internal/model"
 )
 
 type ChatMessage struct {
 	*BaseRepository
-	logger *provider.SystemLogger
+	logger *zap.Logger
 }
 
-func NewChatMessageRepository(db *gorm.DB, logger *provider.SystemLogger) *ChatMessage {
+func NewChatMessageRepository(db *gorm.DB, logger *zap.Logger) *ChatMessage {
 	baseRepo := NewBaseRepository(db)
 	return &ChatMessage{
 		baseRepo,
@@ -23,34 +23,31 @@ func NewChatMessageRepository(db *gorm.DB, logger *provider.SystemLogger) *ChatM
 func (c *ChatMessage) Create(ctx context.Context, chatMessage *model.ChatMessage) (*model.ChatMessage, error) {
 	requestId := ctx.Value("requestID").(string)
 
-	c.logger.NewLog("Create", "requestID", requestId).
-		Debug().
-		Phase("Repository").
-		Exe()
+	c.logger.Debug("Create chat-message",
+		zap.String("requestID", requestId),
+		zap.String("phase", "Repository"))
 
 	db, err := c.GetConnection(ctx)
 	if err != nil {
-		c.logger.NewLog("GetConnection: get connection in the repository", "requestID", requestId).
-			Error().
-			Phase("Repository").
-			Exe()
+		c.logger.Error("GetConnection: get connection in the repository",
+			zap.String("requestID", requestId),
+			zap.Error(err),
+			zap.String("phase", "Repository"))
 		return nil, err
 	}
 
 	if err = db.Create(chatMessage).Error; err != nil {
-		c.logger.NewLog("Create chat-message: error in the create chat-message in the repository", "requestID", requestId).
-			Error().
-			Description("error creating chat-message: " + err.Error()).
-			Phase("Repository").
-			Exe()
+		c.logger.Error("Create chat-message: error in the create chat-message in the repository",
+			zap.String("requestID", requestId),
+			zap.Error(err),
+			zap.String("phase", "Repository"))
 		return nil, err
 	}
 
-	c.logger.NewLog("ChatMessageCreated", "requestID", requestId,
-		"Model chat-message", chatMessage).
-		Debug().
-		Phase("Repository").
-		Exe()
+	c.logger.Debug("Chat-message created",
+		zap.String("requestID", requestId),
+		zap.String("phase", "Repository"),
+		zap.Any("chat-message", chatMessage))
 
 	return chatMessage, nil
 }

@@ -3,7 +3,7 @@ package provider
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"go.uber.org/zap"
 	"io"
 	"net/http"
 	"smart-chat/internal/dto"
@@ -14,10 +14,10 @@ import (
 
 type DeepAiProvider struct {
 	config *model.Config
-	logger *SystemLogger
+	logger *zap.Logger
 }
 
-func NewDeepAiProvider(cfg *model.Config, logger *SystemLogger) *DeepAiProvider {
+func NewDeepAiProvider(cfg *model.Config, logger *zap.Logger) *DeepAiProvider {
 	return &DeepAiProvider{
 		config: cfg,
 		logger: logger,
@@ -27,42 +27,37 @@ func NewDeepAiProvider(cfg *model.Config, logger *SystemLogger) *DeepAiProvider 
 func (t *DeepAiProvider) CallIA(ctx context.Context, text string) (*dto.Answer, error) {
 	requestID := ctx.Value("requestID").(string)
 
-	t.logger.NewLog("CallIA", "requestID", requestID,
-		"text", text).
-		Debug().
-		Phase("Provider").
-		Exe()
+	t.logger.Debug("CallIA",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Provider"))
 
 	client := &http.Client{}
 	answer := dto.Answer{}
 
 	req, err := http.NewRequest("POST", t.config.DeepAi.URL, strings.NewReader("text="+text))
 	if err != nil {
-		t.logger.NewLog("Error creating request", "requestID", requestID).
-			Error().
-			Description("Error creating request: " + err.Error()).
-			Phase("Provider").
-			Exe()
+		t.logger.Error("Error constructing request",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Provider"))
 		return nil, err
 	}
 
 	req.Header.Set("api-key", t.config.DeepAi.ApiKey)
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
-	t.logger.NewLog("constructed request", "requestID", requestID,
-		"request", req).
-		Debug().
-		Phase("Provider").
-		Exe()
+	t.logger.Debug("Request constructed",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Provider"))
+	zap.Any("request", req)
 
 	answer.QuestionDate = time.Now()
 	resp, err := client.Do(req)
 	if err != nil {
-		t.logger.NewLog("Error calling IA", "requestID", requestID).
-			Error().
-			Description("Error calling IA: " + err.Error()).
-			Phase("Provider").
-			Exe()
+		t.logger.Error("Error calling IA",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Provider"))
 		return nil, err
 	}
 	answer.ResponseDate = time.Now()
@@ -70,36 +65,31 @@ func (t *DeepAiProvider) CallIA(ctx context.Context, text string) (*dto.Answer, 
 	defer resp.Body.Close()
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
-		t.logger.NewLog("Error reading response", "requestID", requestID).
-			Error().
-			Description("Error reading response: " + err.Error()).
-			Phase("Provider").
-			Exe()
-		fmt.Println("Error reading response:", err)
+		t.logger.Error("Error reading response",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Provider"))
+
 		return nil, err
 	}
 
-	t.logger.NewLog("Response received", "requestID", requestID,
-		"response", string(body)).
-		Debug().
-		Phase("Provider").
-		Exe()
+	t.logger.Debug("Response read",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Provider"))
 
 	if err = json.Unmarshal(body, &answer); err != nil {
-		t.logger.NewLog("Error unmarshalling response", "requestID", requestID).
-			Error().
-			Description("Error unmarshalling response: " + err.Error()).
-			Phase("Provider").
-			Exe()
-		fmt.Println("Error unmarshalling response:", err)
+		t.logger.Error("Error unmarshalling response",
+			zap.String("requestID", requestID),
+			zap.Error(err),
+			zap.String("phase", "Provider"))
+
 		return nil, err
 	}
 
-	t.logger.NewLog("Response unmarshalled", "requestID", requestID,
-		"answer", answer).
-		Debug().
-		Phase("Provider").
-		Exe()
+	t.logger.Debug("Response unmarshalled",
+		zap.String("requestID", requestID),
+		zap.String("phase", "Provider"))
+	zap.Any("response", answer)
 
 	return &answer, nil
 }

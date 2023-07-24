@@ -21,8 +21,8 @@ func TestChatFacade_CreateChat(t *testing.T) {
 		Return(
 			&model.Chat{
 				ID:        1,
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				CreatedAt: time.Now().String(),
+				UpdatedAt: time.Now().String(),
 			},
 			nil,
 		)
