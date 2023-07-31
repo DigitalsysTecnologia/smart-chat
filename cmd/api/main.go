@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"smart-chat/adapter/database"
 	"smart-chat/adapter/provider"
+	"smart-chat/adapter/provider/medpass"
 	"smart-chat/adapter/rest"
 	"smart-chat/internal/config"
 	v1 "smart-chat/internal/controller/v1"
@@ -48,7 +49,9 @@ func main() {
 	chatController := v1.NewChatController(chatFacade, logger)
 	chatMessageController := v1.NewChatMessageController(chatMessageFacade, logger)
 
-	middlewareLogger := middleware.NewLoggerMiddleware()
+	tokenProvider := medpass.NewAuthorizerGateway()
+
+	middlewareLogger := middleware.NewLoggerMiddleware(tokenProvider)
 
 	serverRest := rest.NewRestServer(
 		cfg,

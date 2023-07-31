@@ -37,13 +37,24 @@ func (c *chatController) Create(g *gin.Context) {
 		requestID = uuid.New().String()
 	}
 
+	chatRequest := &dto.ChatRequest{}
+
+	if err := g.BindJSON(chatRequest); err != nil {
+		c.logger.Error("Error bind json",
+			zap.String("requestID", requestID.(string)),
+			zap.Error(err),
+			zap.String("phase", "Controller"))
+		g.JSON(http.StatusBadRequest, &dto.Error{Message: err.Error()})
+		return
+	}
+
 	c.logger.Debug("Call route Create chat",
 		zap.String("requestID", requestID.(string)),
 		zap.String("phase", "Controller"))
 
 	ctx := context.WithValue(context.Background(), "requestID", requestID)
 
-	chat, err := c.chatFacade.CreateChat(ctx)
+	chat, err := c.chatFacade.CreateChat(ctx, chatRequest)
 	if err != nil {
 		c.logger.Error("Error create chat",
 			zap.String("requestID", requestID.(string)),

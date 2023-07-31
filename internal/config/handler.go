@@ -32,6 +32,7 @@ func (c *configService) loadConfig() {
 			URL:    os.Getenv("DEEP_AI_URL"),
 			ApiKey: os.Getenv("DEEP_AI_KEY"),
 		},
+		AuthorizerApiEndpoint: os.Getenv("AUTHORIZER_API_ENDPOINT"),
 	}
 
 	config.Database.DbConnString = fmt.Sprintf("%s:%s@tcp(%s:%s)/%s", config.Database.Username, config.Database.Password, config.Database.Host, config.Database.Port, config.Database.Database)

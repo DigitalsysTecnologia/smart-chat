@@ -1,11 +1,12 @@
 package v1_test
 
 import (
-	"smart-chat/adapter/provider"
+	"go.uber.org/zap"
 	"smart-chat/adapter/rest"
 	v1 "smart-chat/internal/controller/v1"
 	"smart-chat/internal/middleware"
 	facadeMocks "smart-chat/internal/mocks"
+	providerMocks "smart-chat/internal/mocks"
 	"smart-chat/internal/model"
 	"testing"
 )
@@ -13,6 +14,7 @@ import (
 type Facade struct {
 	ChatFacadeMock        *facadeMocks.ChatFacadeMock
 	ChatMessageFacadeMock *facadeMocks.ChatMessageFacadeMock
+	TokenProviderMock     *providerMocks.TokenProviderMock
 }
 
 func setupTestRouter(t *testing.T) (*rest.ServerRest, Facade) {
@@ -21,6 +23,7 @@ func setupTestRouter(t *testing.T) (*rest.ServerRest, Facade) {
 	facades := Facade{
 		ChatFacadeMock:        &facadeMocks.ChatFacadeMock{},
 		ChatMessageFacadeMock: &facadeMocks.ChatMessageFacadeMock{},
+		TokenProviderMock:     &providerMocks.TokenProviderMock{},
 	}
 
 	cfg := &model.Config{}
@@ -28,12 +31,12 @@ func setupTestRouter(t *testing.T) (*rest.ServerRest, Facade) {
 	serverRest := rest.NewRestServer(
 		cfg,
 		&rest.Controllers{
-			ChatController:        v1.NewChatController(facades.ChatFacadeMock, provider.NewLogger()),
-			ChatMessageController: v1.NewChatMessageController(facades.ChatMessageFacadeMock, provider.NewLogger()),
+			ChatController:        v1.NewChatController(facades.ChatFacadeMock, zap.NewExample()),
+			ChatMessageController: v1.NewChatMessageController(facades.ChatMessageFacadeMock, zap.NewExample()),
 			HeathCheckController:  v1.NewHealthCheckController(),
 		},
 		&rest.Middlewares{
-			LoggerMiddleware: middleware.NewLoggerMiddleware(),
+			LoggerMiddleware: middleware.NewLoggerMiddleware(facades.TokenProviderMock),
 		},
 	)
 

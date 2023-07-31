@@ -45,14 +45,14 @@ func NewRestServer(cfg *model.Config, controllers *Controllers, middlewares *Mid
 }
 
 func (s *ServerRest) registerRoutes() {
-	v1 := s.Engine.Group("smart-chat/v1", s.middlewares.LoggerMiddleware.GenerateLoggerID)
+	v1 := s.Engine.Group("smart-chat/v1", s.middlewares.LoggerMiddleware.ValidateAccess)
 	{
 		v1.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 		v1.GET("/health", s.controllers.HeathCheckController.HealthCheck)
 
 		chatGroup := v1.Group("/chat")
 		{
-			chatGroup.POST("", s.controllers.ChatController.Create)
+			chatGroup.POST("", s.middlewares.LoggerMiddleware.ValidateAccess, s.controllers.ChatController.Create)
 		}
 
 		chatMessageGroup := v1.Group("/chat-message")

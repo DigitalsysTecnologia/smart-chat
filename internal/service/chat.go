@@ -5,6 +5,7 @@ import (
 	"go.uber.org/zap"
 	"smart-chat/internal/constants"
 	"smart-chat/internal/model"
+	"time"
 )
 
 type ChatService struct {
@@ -19,13 +20,16 @@ func NewChatService(chatRepository chatRepository, logger *zap.Logger) *ChatServ
 	}
 }
 
-func (c *ChatService) Create(ctx context.Context) (*model.Chat, error) {
+func (c *ChatService) Create(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
+	chat.CreatedAt = time.Now().UTC().String()
+	chat.UpdatedAt = time.Now().UTC().String()
+
 	requestID := ctx.Value("requestID").(string)
 	c.logger.Debug("Create chat",
 		zap.String("requestID", requestID),
 		zap.String("phase", "Service"))
 
-	return c.chatRepository.Create(ctx)
+	return c.chatRepository.Create(ctx, chat)
 }
 
 func (c *ChatService) GetByID(ctx context.Context, chatID uint64) (*model.Chat, error) {

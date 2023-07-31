@@ -15,21 +15,21 @@ type (
 	}
 )
 
-func (c *ChatRepositoryMock) Create(ctx context.Context) (*model.Chat, error) {
-	args := c.Called(ctx)
+func (c *ChatRepositoryMock) Create(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
+	args := c.Called(ctx, chat)
 
-	chat := &model.Chat{}
+	chatCreated := &model.Chat{}
 	var err error
 
 	if args.Get(0) != nil {
-		chat = args.Get(0).(*model.Chat)
+		chatCreated = args.Get(0).(*model.Chat)
 	}
 
 	if args.Get(1) != nil {
 		err = args.Get(1).(error)
 	}
 
-	return chat, err
+	return chatCreated, err
 }
 
 func (c *ChatRepositoryMock) GetByID(ctx context.Context, chatID uint64) (bool, *model.Chat, error) {

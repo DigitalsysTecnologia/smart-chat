@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/tj/assert"
-	"smart-chat/adapter/provider"
+	"go.uber.org/zap"
 	mockRepository "smart-chat/internal/mocks"
 	"smart-chat/internal/model"
 	"testing"
@@ -16,15 +16,13 @@ func TestChatMessageService_CreateService(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "requestID", "123")
 
 	chatMessageRepositoryMock := &mockRepository.ChatMessageRepositoryMock{}
-	newChatMessageRepository := NewChatMessageService(chatMessageRepositoryMock, provider.NewLogger())
+	newChatMessageRepository := NewChatMessageService(chatMessageRepositoryMock, zap.NewExample())
 
-	userID := uuid.New().String()
 	responseID := uuid.New().String()
 
 	chatMessageRepositoryMock.On("Create", ctx, mock.Anything).
 		Return(&model.ChatMessage{
 			ID:           1,
-			UserID:       userID,
 			Question:     "Qual é a cor do céu?",
 			ResponseID:   responseID,
 			Response:     "Azul",
@@ -36,7 +34,6 @@ func TestChatMessageService_CreateService(t *testing.T) {
 		}, nil)
 
 	chatMessage := &model.ChatMessage{
-		UserID:       userID,
 		Question:     "Qual é a cor do céu?",
 		ResponseID:   responseID,
 		Response:     "Azul",

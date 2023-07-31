@@ -18,14 +18,16 @@ func NewChatFacade(chatService chatService, logger *zap.Logger) *ChatFacade {
 	}
 }
 
-func (c *ChatFacade) CreateChat(ctx context.Context) (*dto.ChatResponse, error) {
+func (c *ChatFacade) CreateChat(ctx context.Context, chatRequest *dto.ChatRequest) (*dto.ChatResponse, error) {
+	chatVO := chatRequest.ParseFromChatRequest()
+
 	req := ctx.Value("requestID").(string)
 	c.logger.Debug(
 		"CreateChat",
 		zap.String("requestID", req),
 		zap.String("phase", "Facade"))
 
-	chatCreated, err := c.chatService.Create(ctx)
+	chatCreated, err := c.chatService.Create(ctx, chatVO)
 	if err != nil {
 		c.logger.Error("CreateChat: error in the create chat in the service",
 			zap.String("requestID", req),

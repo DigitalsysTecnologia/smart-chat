@@ -6,7 +6,7 @@ import (
 )
 
 type chatFacade interface {
-	CreateChat(ctx context.Context) (*dto.ChatResponse, error)
+	CreateChat(ctx context.Context, request *dto.ChatRequest) (*dto.ChatResponse, error)
 }
 
 type chatMessageFacade interface {

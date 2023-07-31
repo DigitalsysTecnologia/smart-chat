@@ -6,7 +6,7 @@ import (
 )
 
 type chatRepository interface {
-	Create(ctx context.Context) (*model.Chat, error)
+	Create(ctx context.Context, chat *model.Chat) (*model.Chat, error)
 	GetByID(ctx context.Context, chatID uint64) (bool, *model.Chat, error)
 }
 

@@ -21,7 +21,7 @@ func NewChatRepository(db *gorm.DB, logger *zap.Logger) *chatRepository {
 	}
 }
 
-func (c *chatRepository) Create(ctx context.Context) (*model.Chat, error) {
+func (c *chatRepository) Create(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
 	requestId := ctx.Value("requestID").(string)
 
 	c.logger.Debug("Create chat",
@@ -37,7 +37,6 @@ func (c *chatRepository) Create(ctx context.Context) (*model.Chat, error) {
 		return nil, err
 	}
 
-	chat := &model.Chat{}
 	if err = db.Create(chat).Error; err != nil {
 		c.logger.Error("Create chat: error in the create chat in the repository",
 			zap.String("requestID", requestId),

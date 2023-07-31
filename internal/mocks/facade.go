@@ -15,8 +15,8 @@ type (
 	}
 )
 
-func (a *ChatFacadeMock) CreateChat(ctx context.Context) (*dto.ChatResponse, error) {
-	args := a.Called(ctx)
+func (a *ChatFacadeMock) CreateChat(ctx context.Context, request *dto.ChatRequest) (*dto.ChatResponse, error) {
+	args := a.Called(ctx, request)
 
 	chatResponse := &dto.ChatResponse{}
 	var err error

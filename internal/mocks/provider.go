@@ -10,6 +10,9 @@ type (
 	DeepAiProviderMock struct {
 		mock.Mock
 	}
+	TokenProviderMock struct {
+		mock.Mock
+	}
 )
 
 func (d *DeepAiProviderMock) CallIA(ctx context.Context, text string) (*dto.Answer, error) {
@@ -27,4 +30,16 @@ func (d *DeepAiProviderMock) CallIA(ctx context.Context, text string) (*dto.Answ
 	}
 
 	return answer, err
+}
+
+func (t *TokenProviderMock) ValidateToken(token string) error {
+	args := t.Called(token)
+
+	var err error
+
+	if args.Get(0) != nil {
+		err = args.Get(0).(error)
+	}
+
+	return err
 }

@@ -6,7 +6,6 @@ import (
 
 type ChatMessage struct {
 	ID           int64     `json:"id" gorm:"primaryKey;column:id"`
-	UserID       string    `json:"user_id" gorm:"column:user_id"`
 	Question     string    `json:"question" gorm:"column:question"`
 	ResponseID   string    `json:"response_id" gorm:"column:response_id"`
 	Response     string    `json:"response" gorm:"column:response"`

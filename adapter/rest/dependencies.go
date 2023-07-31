@@ -28,5 +28,5 @@ type heathCheckController interface {
 }
 
 type loggerMiddleware interface {
-	GenerateLoggerID(c *gin.Context)
+	ValidateAccess(c *gin.Context)
 }

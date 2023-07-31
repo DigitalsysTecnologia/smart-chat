@@ -13,7 +13,6 @@ func init() {
 			sql := `CREATE TABLE IF NOT EXISTS chat_message(
 					id INT AUTO_INCREMENT PRIMARY KEY,
 					chat_id int,
-					user_id VARCHAR(191),
 					question LONGTEXT,
 					response_id VARCHAR(191),
 					Response LONGTEXT,

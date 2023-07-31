@@ -6,7 +6,6 @@ import (
 )
 
 type ChatMessageRequest struct {
-	UserID   string `json:"user_id"`
 	ChatID   uint64 `json:"chat_id"`
 	Question string `json:"question"`
 }
@@ -14,7 +13,6 @@ type ChatMessageRequest struct {
 func (c *ChatMessageRequest) ParseFromChatMessageRequestAndAnswer() *model.ChatMessage {
 
 	return &model.ChatMessage{
-		UserID:       c.UserID,
 		ChatID:       c.ChatID,
 		Question:     c.Question,
 		QuestionDate: time.Now(),

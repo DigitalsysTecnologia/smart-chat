@@ -5,8 +5,8 @@ import (
 	"errors"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+	"go.uber.org/zap"
 	"reflect"
-	"smart-chat/adapter/provider"
 	"smart-chat/internal/dto"
 	layerMock "smart-chat/internal/mocks"
 	"smart-chat/internal/model"
@@ -16,7 +16,6 @@ import (
 
 func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 	ctx := context.WithValue(context.Background(), "requestID", "123")
-	userID := uuid.New().String()
 	responseID := uuid.New().String()
 
 	testCases := []struct {
@@ -34,8 +33,8 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			name: "OK",
 			getByIDResponse: &model.Chat{
 				ID:        1,
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				CreatedAt: time.Now().String(),
+				UpdatedAt: time.Now().String(),
 			},
 			getByIDResponseError: nil,
 			deepAiProviderResponse: &dto.Answer{
@@ -47,7 +46,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			deepAiProviderResponseError: nil,
 			createChatMessageResponse: &model.ChatMessage{
 				ID:           1,
-				UserID:       userID,
 				Question:     "Qual é a cor do céu?",
 				ResponseID:   responseID,
 				Response:     "Azul",
@@ -59,7 +57,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			},
 			createChatMessageResponseError: nil,
 			chatMessageRequest: &dto.ChatMessageRequest{
-				UserID:   userID,
 				Question: "Qual é a cor do céu?",
 				ChatID:   1,
 			},
@@ -73,7 +70,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			deepAiProviderResponseError: errors.New("internal server error"),
 			createChatMessageResponse: &model.ChatMessage{
 				ID:           1,
-				UserID:       userID,
 				Question:     "Qual é a cor do céu?",
 				ResponseID:   responseID,
 				Response:     "Azul",
@@ -85,7 +81,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			},
 			createChatMessageResponseError: nil,
 			chatMessageRequest: &dto.ChatMessageRequest{
-				UserID:   userID,
 				Question: "Qual é a cor do céu?",
 				ChatID:   1,
 			},
@@ -95,15 +90,14 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			name: "DeepAiProvider returns error",
 			getByIDResponse: &model.Chat{
 				ID:        1,
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				CreatedAt: time.Now().String(),
+				UpdatedAt: time.Now().String(),
 			},
 			getByIDResponseError:        nil,
 			deepAiProviderResponse:      &dto.Answer{},
 			deepAiProviderResponseError: errors.New("internal server error"),
 			createChatMessageResponse: &model.ChatMessage{
 				ID:           1,
-				UserID:       userID,
 				Question:     "Qual é a cor do céu?",
 				ResponseID:   responseID,
 				Response:     "Azul",
@@ -115,7 +109,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			},
 			createChatMessageResponseError: nil,
 			chatMessageRequest: &dto.ChatMessageRequest{
-				UserID:   userID,
 				Question: "Qual é a cor do céu?",
 				ChatID:   1,
 			},
@@ -125,8 +118,8 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			name: "CreateChatMessage returns error",
 			getByIDResponse: &model.Chat{
 				ID:        1,
-				CreatedAt: time.Now(),
-				UpdatedAt: time.Now(),
+				CreatedAt: time.Now().String(),
+				UpdatedAt: time.Now().String(),
 			},
 			getByIDResponseError: nil,
 			deepAiProviderResponse: &dto.Answer{
@@ -139,7 +132,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			createChatMessageResponse:      &model.ChatMessage{},
 			createChatMessageResponseError: errors.New("internal server error"),
 			chatMessageRequest: &dto.ChatMessageRequest{
-				UserID:   userID,
 				Question: "Qual é a cor do céu?",
 				ChatID:   1,
 			},
@@ -153,7 +145,7 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			deepAiProviderMock := &layerMock.DeepAiProviderMock{}
 			chatMock := &layerMock.ChatServiceMock{}
 
-			newChatMessage := NewChatMessageFacade(chatMessageMock, chatMock, deepAiProviderMock, provider.NewLogger())
+			newChatMessage := NewChatMessageFacade(chatMessageMock, chatMock, deepAiProviderMock, zap.NewExample())
 
 			chatMock.On("GetByID", ctx, mock.Anything).
 				Return(

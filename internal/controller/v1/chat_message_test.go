@@ -16,23 +16,26 @@ import (
 func TestChatMessageController_Create(t *testing.T) {
 
 	testCases := []struct {
-		name                      string
-		request                   interface{}
-		urlRequested              string
-		expectedHttpStatusCode    int
-		FacadeChatMessageResponse *dto.ChatMessageResponse
-		FacadeChatMessageError    error
-		expectedError             error
+		name                       string
+		request                    interface{}
+		urlRequested               string
+		expectedHttpStatusCode     int
+		FacadeChatMessageResponse  *dto.ChatMessageResponse
+		FacadeChatMessageError     error
+		TokenProviderRequest       string
+		TokenProviderResponseError error
+		expectedError              error
 	}{
 		{
 			name: "OK",
 			request: &dto.ChatMessageRequest{
 				ChatID:   1,
 				Question: "Hello",
-				UserID:   "123",
 			},
-			urlRequested:           "/smart-chat/v1/chat-message",
-			expectedHttpStatusCode: http.StatusCreated,
+			TokenProviderRequest:       "XPTO",
+			TokenProviderResponseError: nil,
+			urlRequested:               "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode:     http.StatusCreated,
 			FacadeChatMessageResponse: &dto.ChatMessageResponse{
 				Answer: "Hi",
 			},
@@ -40,10 +43,12 @@ func TestChatMessageController_Create(t *testing.T) {
 			expectedError:          nil,
 		},
 		{
-			name:                   "BindJsonError",
-			request:                "error_bind_json",
-			urlRequested:           "/smart-chat/v1/chat-message",
-			expectedHttpStatusCode: http.StatusBadRequest,
+			name:                       "BindJsonError",
+			request:                    "error_bind_json",
+			TokenProviderRequest:       "XPTO",
+			TokenProviderResponseError: nil,
+			urlRequested:               "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode:     http.StatusBadRequest,
 			FacadeChatMessageResponse: &dto.ChatMessageResponse{
 				Answer: "Hi",
 			},
@@ -55,10 +60,11 @@ func TestChatMessageController_Create(t *testing.T) {
 			request: &dto.ChatMessageRequest{
 				ChatID:   1,
 				Question: "Hello",
-				UserID:   "123",
 			},
-			urlRequested:           "/smart-chat/v1/chat-message",
-			expectedHttpStatusCode: http.StatusNotFound,
+			TokenProviderRequest:       "XPTO",
+			TokenProviderResponseError: nil,
+			urlRequested:               "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode:     http.StatusNotFound,
 			FacadeChatMessageResponse: &dto.ChatMessageResponse{
 				Answer: "Hi",
 			},
@@ -70,10 +76,11 @@ func TestChatMessageController_Create(t *testing.T) {
 			request: &dto.ChatMessageRequest{
 				ChatID:   1,
 				Question: "Hello",
-				UserID:   "123",
 			},
-			urlRequested:           "/smart-chat/v1/chat-message",
-			expectedHttpStatusCode: http.StatusInternalServerError,
+			TokenProviderRequest:       "XPTO",
+			TokenProviderResponseError: nil,
+			urlRequested:               "/smart-chat/v1/chat-message",
+			expectedHttpStatusCode:     http.StatusInternalServerError,
 			FacadeChatMessageResponse: &dto.ChatMessageResponse{
 				Answer: "Hi",
 			},
@@ -90,6 +97,8 @@ func TestChatMessageController_Create(t *testing.T) {
 			facade.ChatMessageFacadeMock.On("CreateChatMessage", mock.Anything, mock.Anything).
 				Return(tc.FacadeChatMessageResponse, tc.FacadeChatMessageError)
 
+			facade.TokenProviderMock.On("ValidateToken", mock.Anything).Return(nil)
+
 			data, err := json.Marshal(tc.request)
 			assert.NoError(t, err)
 			reader := bytes.NewReader(data)
@@ -97,6 +106,7 @@ func TestChatMessageController_Create(t *testing.T) {
 			w := httptest.NewRecorder()
 			req, _ := http.NewRequest(http.MethodPost, tc.urlRequested, reader)
 			req.Header.Set("Content-Type", "application/json")
+			req.Header.Set("AuthToken", tc.TokenProviderRequest)
 			router.ServeHTTP(w, req)
 
 			assert.Equal(t, tc.expectedHttpStatusCode, w.Code)
