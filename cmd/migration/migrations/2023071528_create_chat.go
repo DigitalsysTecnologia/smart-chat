@@ -12,8 +12,7 @@ func init() {
 			sql := `CREATE TABLE IF NOT EXISTS chat(
 					id INT AUTO_INCREMENT PRIMARY KEY,
 					user_id VARCHAR(191),
-					created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-					updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+					created_at VARCHAR(50)
 					);`
 
 			if err := tx.Exec(sql).Error; err != nil {

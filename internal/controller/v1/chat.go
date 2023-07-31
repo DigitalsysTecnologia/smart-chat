@@ -69,5 +69,5 @@ func (c *chatController) Create(g *gin.Context) {
 		zap.Any("chat", chat),
 		zap.String("phase", "Controller"))
 
-	g.JSON(http.StatusCreated, chat.ChatID)
+	g.JSON(http.StatusCreated, chat)
 }

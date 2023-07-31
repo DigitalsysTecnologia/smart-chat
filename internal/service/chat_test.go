@@ -23,7 +23,6 @@ func TestChatService_CreateChat(t *testing.T) {
 		Return(&model.Chat{
 			ID:        1,
 			CreatedAt: time.Now().String(),
-			UpdatedAt: time.Now().String(),
 		}, nil)
 
 	chatToCreate := &model.Chat{
@@ -47,7 +46,6 @@ func TestChatService_GetByID(t *testing.T) {
 			&model.Chat{
 				ID:        1,
 				CreatedAt: time.Now().String(),
-				UpdatedAt: time.Now().String(),
 			}, nil)
 
 	chat, err := newChatService.GetByID(ctx, 1)
@@ -68,7 +66,6 @@ func TestChatService_GetByID_NotFound(t *testing.T) {
 			&model.Chat{
 				ID:        1,
 				CreatedAt: time.Now().String(),
-				UpdatedAt: time.Now().String(),
 			}, nil)
 
 	_, err := newChatService.GetByID(ctx, 1)

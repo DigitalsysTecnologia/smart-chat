@@ -21,7 +21,7 @@ func NewAuthorizerGateway() AuthorizerGateway {
 
 	return &authorizer{
 		BaseURL: &url.URL{
-			Scheme: "http",
+			Scheme: "https",
 			Host:   cfg.Config.AuthorizerApiEndpoint,
 			Path:   "/authorizer-v2/v2/",
 		},

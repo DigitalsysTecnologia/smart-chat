@@ -34,7 +34,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			getByIDResponse: &model.Chat{
 				ID:        1,
 				CreatedAt: time.Now().String(),
-				UpdatedAt: time.Now().String(),
 			},
 			getByIDResponseError: nil,
 			deepAiProviderResponse: &dto.Answer{
@@ -91,7 +90,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			getByIDResponse: &model.Chat{
 				ID:        1,
 				CreatedAt: time.Now().String(),
-				UpdatedAt: time.Now().String(),
 			},
 			getByIDResponseError:        nil,
 			deepAiProviderResponse:      &dto.Answer{},
@@ -119,7 +117,6 @@ func TestChatMessageFacade_CreateChatMessage_OK(t *testing.T) {
 			getByIDResponse: &model.Chat{
 				ID:        1,
 				CreatedAt: time.Now().String(),
-				UpdatedAt: time.Now().String(),
 			},
 			getByIDResponseError: nil,
 			deepAiProviderResponse: &dto.Answer{

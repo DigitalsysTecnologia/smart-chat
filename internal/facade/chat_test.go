@@ -23,7 +23,6 @@ func TestChatFacade_CreateChat(t *testing.T) {
 			&model.Chat{
 				ID:        1,
 				CreatedAt: time.Now().String(),
-				UpdatedAt: time.Now().String(),
 			},
 			nil,
 		)

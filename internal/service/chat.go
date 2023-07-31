@@ -22,7 +22,6 @@ func NewChatService(chatRepository chatRepository, logger *zap.Logger) *ChatServ
 
 func (c *ChatService) Create(ctx context.Context, chat *model.Chat) (*model.Chat, error) {
 	chat.CreatedAt = time.Now().UTC().String()
-	chat.UpdatedAt = time.Now().UTC().String()
 
 	requestID := ctx.Value("requestID").(string)
 	c.logger.Debug("Create chat",
